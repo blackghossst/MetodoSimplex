@@ -1,0 +1,118 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Método Simplex{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <h1 class="mb-4 text-center text-primary">Calculadora Método Simplex</h1>
+    <p class="text-center lead mb-4">Resuelve problemas de programación lineal utilizando el Método Simplex para optimización (maximización o minimización).</p>
+
+    <div class="card shadow-sm p-4 mb-5 mx-auto" style="max-width: 800px;">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">Ingresa los Parámetros del Problema</h5>
+            <form method="POST" action="{% url 'metodo_simplex' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="funcionObjetivo" class="form-label">Función Objetivo (ej: 3x1 + 2x2):</label>
+                    <input type="text" id="funcionObjetivo" name="funcion_objetivo" class="form-control" placeholder="Ej: 3x1 + 2x2" required value="{{ input_funcion_objetivo }}">
+                    <small class="form-text text-muted">Usa 'x' seguido del número de la variable (ej: x1, x2). Separa los términos con '+' o '-'.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="tipoOptimizacion" class="form-label">Tipo de Optimización:</label>
+                    <select id="tipoOptimizacion" name="tipo_optimizacion" class="form-select">
+                        <option value="maximizar" {% if input_tipo_optimizacion == 'maximizar' %}selected{% endif %}>Maximizar</option>
+                        <option value="minimizar" {% if input_tipo_optimizacion == 'minimizar' %}selected{% endif %}>Minimizar</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="restricciones" class="form-label">Restricciones (una por línea):</label>
+                    <textarea id="restricciones" name="restricciones" class="form-control" rows="5" placeholder="Ej:&#102x1 + x2 <= 10&#10x1 + 3x2 <= 12&#10x1 >= 0&#10x2 >= 0" required>{{ input_restricciones }}</textarea>
+                    <small class="form-text text-muted">Ingresa cada restricción en una nueva línea. Usa `<=`, `>=`, o `=`.</small>
+                    <small class="form-text text-muted">Las restricciones de no negatividad (ej: `x1 >= 0`) son importantes.</small>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg mt-3" type="submit">Calcular Simplex</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if error_msg %}
+        <div class="alert alert-danger text-center mx-auto" role="alert" style="max-width: 800px;">
+            {{ error_msg }}
+        </div>
+    {% endif %}
+
+    {% if resultado %}
+        <div id="resultado" class="result-container text-center mb-5 p-4 bg-light rounded shadow-sm mx-auto" style="max-width: 800px;">
+            <h2 class="text-success mb-3">¡Cálculo Simplex Completado!</h2>
+            <p class="fs-5"><strong>Valor Óptimo de la Función Objetivo:</strong> <span class="text-info">{{ resultado }}</span></p>
+            {% comment %}
+            Puedes añadir aquí los valores de las variables si los pasas desde la vista.
+            Por ejemplo, si `variables_valores` es un diccionario en tu contexto:
+            <p class="fs-5"><strong>Valores de las Variables:</strong></p>
+            <ul>
+                {% for var, val in variables_valores.items %}
+                    <li><strong>{{ var }}:</strong> {{ val|floatformat:"4" }}</li>
+                {% endfor %}
+            </ul>
+            {% endcomment %}
+        </div>
+
+        {% if pasos %}
+            <div id="pasos" class="mb-5 text-center">
+                <h2 class="text-primary mb-4">Pasos del Método Simplex:</h2>
+                <div class="d-flex justify-content-center">
+                    <div id="mathjax-pasos" class="formulario-card p-4 mb-4"
+                        style="background-color: #f8f9fa; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-height: 600px; overflow-y: auto; max-width: 900px; font-size: 1.1rem; line-height: 1.7; text-align: left;">
+                        {{ pasos|safe }}
+                    </div>
+                </div>
+                <small class="text-muted mt-3 d-block">Las ecuaciones y explicaciones están formateadas para mayor claridad.</small>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center mx-auto" role="alert" style="max-width: 800px;">
+                ¡Inicia sesión para ver los pasos completos y guardar este cálculo en tu historial!
+                <a href="{% url 'login' %}" class="alert-link">Inicia sesión aquí</a> o <a href="{% url 'registro' %}" class="alert-link">Regístrate</a>.
+            </div>
+        {% endif %}
+
+    {% endif %}
+</div>
+
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+<script>
+    // Configuración opcional de MathJax si necesitas ajustes específicos
+    MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: {
+            fontCache: 'global'
+        }
+    };
+</script>
+
+<button type="button" class="btn btn-outline-info btn-sm mt-3" id="loadSimplexExampleBtn">Cargar Ejemplo</button>
+
+<script>
+    document.getElementById('loadSimplexExampleBtn').addEventListener('click', function() {
+        fetch('{% url "load_example_simplex" %}')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('input[name="funcion_objetivo"]').value = data.funcion_objetivo;
+                document.querySelector('select[name="tipo_optimizacion"]').value = data.tipo_optimizacion;
+                document.querySelector('textarea[name="restricciones"]').value = data.restricciones;
+            })
+            .catch(error => console.error('Error loading example:', error));
+    });
+</script>
+
+{% endblock %}

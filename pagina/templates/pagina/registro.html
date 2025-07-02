@@ -1,0 +1,144 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Registro de Usuario{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="formulario-card">
+        <h2 class="text-center mb-4">Registro de Usuario</h2>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-3 row">
+                <label for="id_username" class="col-sm-4 col-form-label">Nombre de Usuario</label>
+                <div class="col-sm-8">
+                    <input type="text" name="username" id="id_username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" value="{{ form.username.value|default:'' }}" required>
+                    {% for error in form.username.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                    <div id="username-error" class="text-danger mt-1"></div>
+                </div>    
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_nombre_completo" class="col-sm-4 col-form-label">Nombre Completo</label>
+                <div class="col-sm-8">
+                    <input type="text" name="nombre_completo" id="id_nombre_completo" class="form-control {% if form.nombre_completo.errors %}is-invalid{% endif %}" value="{{ form.nombre_completo.value|default:'' }}" required>
+                    {% for error in form.nombre_completo.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_correo" class="col-sm-4 col-form-label">Correo</label>
+                <div class="col-sm-8">
+                    <input type="email" name="correo" id="id_correo" class="form-control {% if form.correo.errors %}is-invalid{% endif %}" value="{{ form.correo.value|default:'' }}" required>
+                    {% for error in form.correo.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                    <div id="correo-error" class="text-danger mt-1"></div> 
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_carrera" class="col-sm-4 col-form-label">Carrera</label>
+                <div class="col-sm-8">
+                    <input type="text" name="carrera" id="id_carrera" class="form-control {% if form.carrera.errors %}is-invalid{% endif %}" value="{{ form.carrera.value|default:'' }}" required>
+                    {% for error in form.carrera.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_carnet" class="col-sm-4 col-form-label">Carnet</label>
+                <div class="col-sm-8">
+                    <input type="text" name="carnet" id="id_carnet" class="form-control {% if form.carnet.errors %}is-invalid{% endif %}" value="{{ form.carnet.value|default:'' }}" required>
+                    {% for error in form.carnet.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                    <div id="carnet-error" class="text-danger mt-1"></div> 
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_ciclo" class="col-sm-4 col-form-label">Ciclo</label>
+                <div class="col-sm-8">
+                    <input type="text" name="ciclo" id="id_ciclo" class="form-control {% if form.ciclo.errors %}is-invalid{% endif %}" value="{{ form.ciclo.value|default:'' }}" required>
+                    {% for error in form.ciclo.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_avatar" class="col-sm-4 col-form-label">Foto de Perfil</label>
+                <div class="col-sm-8">
+                    <input type="file" name="avatar" id="id_avatar" class="form-control {% if form.avatar.errors %}is-invalid{% endif %}">
+                    {% for error in form.avatar.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_password1" class="col-sm-4 col-form-label">Contraseña</label>
+                <div class="col-sm-8">
+                    <input type="password" name="password1" id="id_password1" class="form-control {% if form.password1.errors %}is-invalid{% endif %}" required>
+                    {% for error in form.password1.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_password2" class="col-sm-4 col-form-label">Confirmar Contraseña</label>
+                <div class="col-sm-8">
+                    <input type="password" name="password2" id="id_password2" class="form-control {% if form.password2.errors %}is-invalid{% endif %}" required>
+                    {% for error in form.password2.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Registrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    function validarCampos() {
+        var username = $('#id_username').val();
+        var correo = $('#id_correo').val();
+        var carnet = $('#id_carnet').val();
+
+        $.ajax({
+            url: "{% url 'validar_campos' %}",
+            data: {
+                'username': username,
+                'correo': correo,
+                'carnet': carnet
+            },
+            dataType: 'json',
+            success: function(data) {
+                $('#username-error').text(data.errores.username || '');
+                $('#correo-error').text(data.errores.correo || '');
+                $('#carnet-error').text(data.errores.carnet || '');
+            }
+        });
+    }
+
+    $('#id_username, #id_correo, #id_carnet').on('input', validarCampos);
+});
+</script>
+{% endblock %}
+
+

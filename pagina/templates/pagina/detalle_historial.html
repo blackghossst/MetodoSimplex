@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container mt-4 d-flex flex-column align-items-center">
+
+    <div class="formulario-card p-4 mb-4" style="background-color: #f0f4f8; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 900px;">
+        <h1 class="mb-4 text-center">Detalles de la Operación</h1>
+
+        <ul class="list-group mb-4">
+            <li class="list-group-item"><strong>Fecha:</strong> {{ historial.fecha|date:"Y-m-d H:i" }}</li>
+            <li class="list-group-item"><strong>Método:</strong> {{ historial.metodo }}</li>
+            <li class="list-group-item"><strong>Ecuación:</strong> {{ historial.ecuacion }}</li>
+
+            {% if historial.metodo == 'Muller' %}
+                <li class="list-group-item"><strong>Datos Iniciales:</strong> x₀ = {{ historial.x0 }}, x₁ = {{ historial.x1 }}, x₂ = {{ historial.x2 }}</li>
+                <li class="list-group-item"><strong>Iteraciones:</strong> {{ historial.iteraciones }}</li>
+           
+            {% elif historial.metodo == 'Cuadratura Gaussiana' %}
+                <li class="list-group-item"><strong>Intervalo:</strong> a = {{ historial.x0 }}, b = {{ historial.x1 }}</li>
+                <li class="list-group-item"><strong>Orden de la Cuadratura:</strong> {{ historial.orden }}</li>
+            {% endif %}
+
+            <li class="list-group-item"><strong>Resultado:</strong> {{ historial.resultado }}</li>
+        </ul>
+    </div>
+
+    <div class="formulario-card p-4 mb-4" style="background-color: #f0f4f8; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-height: 600px; overflow-y: auto; max-width: 900px;">
+        {% if historial.metodo == 'Muller' %}
+            <h4 class="text-center mb-3">Pasos Detallados del Método de Müller:</h4>
+            
+        {% elif historial.metodo == 'Cuadratura Gaussiana' %}
+            <h4 class="text-center mb-3">Pasos Detallados de la Cuadratura Gaussiana:</h4>
+        {% endif %}
+
+        {{ historial.pasos|safe }}
+    </div>
+
+    <div class="text-center">
+        <a href="{% url 'historial' %}" class="btn btn-secondary mt-3">Volver al Historial</a>
+    </div>
+
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,202 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="formulario-card">
+
+        <div class="text-center mb-4">
+            <img id="avatar-img" src="{{ usuario.avatar.url }}" alt="Foto de perfil" class="rounded-circle shadow" width="150" height="150" style="object-fit: cover; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#verFotoModal">
+
+            <div class="mt-3">
+                <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#cambiarFotoModal">
+                    <i class="bi bi-camera-fill"></i> Cambiar Foto
+                </button>
+            </div>
+        </div>
+        <h3 class="text-center mb-3">{{ usuario.nombre_completo }}</h3>
+        <p><strong>Correo:</strong> {{ usuario.correo }}</p>
+        <p><strong>Carrera:</strong> {{ usuario.carrera }}</p>
+        <p><strong>Carnet:</strong> {{ usuario.carnet }}</p>
+        <p><strong>Ciclo:</strong> {{ usuario.ciclo }}</p>
+        <div class="text-center mt-4 d-flex justify-content-center gap-2">
+            <a href="{% url 'editar_perfil' %}" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-pencil-fill"></i> Editar Perfil
+            </a>
+          <button type="button" class="btn btn-outline-danger btn-lg" data-bs-toggle="modal" data-bs-target="#cerrarSesionModal">
+        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+    </button>
+
+<button type="button" class="btn btn-outline-danger btn-lg" data-bs-toggle="modal" data-bs-target="#eliminarPerfilModal">
+    <i class="bi bi-trash"></i> Eliminar Perfil
+</button>
+
+
+<div class="modal fade" id="eliminarPerfilModal" tabindex="-1" aria-labelledby="eliminarPerfilModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eliminarPerfilModalLabel">Confirmar Eliminación de Perfil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Estás a punto de eliminar tu perfil. Esta acción es **irreversible**.</p>
+                <p>Para proceder, por favor ingresa tu contraseña:</p>
+                
+
+                <form id="formEliminarPerfilModal" method="post" action="{% url 'eliminar_perfil_confirmar' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3"> 
+                        <label for="id_password_modal" class="form-label">Contraseña actual</label>
+                        <input type="password" name="password" id="id_password_modal" class="form-control" placeholder="Introduce tu contraseña" required>
+                        <div id="password-errors-modal" class="text-danger mt-1"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger">Confirmar y Eliminar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cerrarSesionModal" tabindex="-1" aria-labelledby="cerrarSesionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cerrarSesionModalLabel">Confirmar Cierre de Sesión</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro que deseas cerrar sesión?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="{% url 'logout' %}" class="btn btn-danger">Cerrar Sesión</a>
+            </div>
+        </div>
+    </div>
+</div>
+       
+
+<div class="modal fade" id="cambiarFotoModal" tabindex="-1" aria-labelledby="cambiarFotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="form-cambiar-foto" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cambiarFotoModalLabel">Cambiar Foto de Perfil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="file" name="avatar" class="form-control" accept="image/*" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="verFotoModal" tabindex="-1" aria-labelledby="verFotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg"> 
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verFotoModalLabel">Foto de Perfil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="foto-ampliada" src="{{ usuario.avatar.url }}" alt="Foto Ampliada" class="img-fluid rounded shadow" style="max-height: 500px; object-fit: contain;">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('form-cambiar-foto').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    const response = await fetch("{% url 'cambiar_foto' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+        document.getElementById('avatar-img').src = result.nueva_foto;
+        var modal = bootstrap.Modal.getInstance(document.getElementById('cambiarFotoModal'));
+        modal.hide();
+        alert('Foto actualizada con éxito');
+    } else {
+        alert('Error al actualizar la foto');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+        const modalForm = document.getElementById('formEliminarPerfilModal');
+        const passwordInput = document.getElementById('id_password_modal');
+        const passwordErrorsDiv = document.getElementById('password-errors-modal');
+        const eliminarPerfilModal = new bootstrap.Modal(document.getElementById('eliminarPerfilModal'));
+
+        if (modalForm) {
+            modalForm.addEventListener('submit', function(e) {
+                e.preventDefault(); 
+
+                passwordErrorsDiv.textContent = ''; 
+                const formData = new FormData(modalForm);
+                const csrfToken = formData.get('csrfmiddlewaretoken');
+
+                fetch(modalForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest', 
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        eliminarPerfilModal.hide();
+                        document.getElementById('eliminarPerfilModal').addEventListener('hidden.bs.modal', function () {
+                            window.location.href = data.redirect_url;
+                        }, { once: true }); 
+                        
+                    } else {
+                        if (data.message) {
+                            alert(data.message); 
+                        }
+                        if (data.errors && JSON.parse(data.errors).password) {
+                            const errors = JSON.parse(data.errors).password;
+                            passwordErrorsDiv.textContent = errors[0].message; 
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al eliminar el perfil:', error);
+                    alert('Ocurrió un error de red o del servidor. Por favor, inténtalo de nuevo.');
+                });
+            });
+        }
+
+        document.getElementById('eliminarPerfilModal').addEventListener('hidden.bs.modal', function () {
+            passwordInput.value = '';
+            passwordErrorsDiv.textContent = '';
+        });
+        document.getElementById('eliminarPerfilModal').addEventListener('shown.bs.modal', function () {
+            passwordInput.focus(); 
+        });
+
+    });
+</script>
+{% endblock %}
+

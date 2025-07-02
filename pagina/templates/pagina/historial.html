@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Historial de Ecuaciones</h1>
+
+    {% if registros %}
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle text-center">
+               <thead class="table-primary">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Método</th>
+                        <th>Ecuación</th>
+                        <th>Resultado</th>
+                        <th>Detalles</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in registros %}
+                    <tr>
+                        <td>{{ item.fecha|date:"Y-m-d H:i" }}</td>
+                        <td>{{ item.metodo }}</td>
+                        <td class="text-break">{{ item.ecuacion }}</td>
+                        <td>{{ item.resultado }}</td>
+                        <td>
+                            <a href="{% url 'detalle_historial' item.id %}" class="btn btn-info btn-sm">
+                                Ver Detalles
+                            </a>
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'eliminar_historial' item.id %}" onsubmit="return confirm('¿Estás segura de que deseas eliminar este registro?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No hay registros aún.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Calculadora simplex{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="mb-4">🤖 ¡Bienvenido tu calculadora de ejercicios Simplex</span>!</h1>
+    <p class="lead">Tu plataforma confiable para resolver ecuaciones usando el <strong>Metodo Simplex</strong> de manera fácil, rápida y guiada.</p>
+    <img src="{% static 'images/maxresdefault.jpg' %}" alt="Colorful illustration of mathematical symbols and equations representing numerical analysis, with a bright and engaging tone. The background includes abstract shapes and formulas, creating a dynamic and educational atmosphere. If present, visible text in the image reads Analisis Numerico." class="img-fluid my-4 rounded" style="max-height: 400px;">
+</div>
+
+<div class="mt-5 text-center">
+    <a href="{% url 'metodo_simplex' %}" class="btn btn-success btn-lg">¡Empezar a Resolver! 🚀</a>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Editar Perfil{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="formulario-card">
+        <h2 class="mb-4 text-center">✏️ Editar Perfil</h2>
+
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-3 row">
+                <label for="id_nombre_completo" class="col-sm-4 col-form-label">Nombre Completo</label>
+                <div class="col-sm-8">
+                    <input type="text" name="nombre_completo" id="id_nombre_completo" class="form-control {% if form.nombre_completo.errors %}is-invalid{% endif %}" value="{{ form.nombre_completo.value|default:'' }}" required>
+                    {% for error in form.nombre_completo.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_correo" class="col-sm-4 col-form-label">Correo</label>
+                <div class="col-sm-8">
+                    <input type="email" name="correo" id="id_correo" class="form-control {% if form.correo.errors %}is-invalid{% endif %}" value="{{ form.correo.value|default:'' }}" required>
+                    {% for error in form.correo.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_carrera" class="col-sm-4 col-form-label">Carrera</label>
+                <div class="col-sm-8">
+                    <input type="text" name="carrera" id="id_carrera" class="form-control {% if form.carrera.errors %}is-invalid{% endif %}" value="{{ form.carrera.value|default:'' }}" required>
+                    {% for error in form.carrera.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_carnet" class="col-sm-4 col-form-label">Carnet</label>
+                <div class="col-sm-8">
+                    <input type="text" name="carnet" id="id_carnet" class="form-control {% if form.carnet.errors %}is-invalid{% endif %}" value="{{ form.carnet.value|default:'' }}" required>
+                    {% for error in form.carnet.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_ciclo" class="col-sm-4 col-form-label">Ciclo</label>
+                <div class="col-sm-8">
+                    <input type="text" name="ciclo" id="id_ciclo" class="form-control {% if form.ciclo.errors %}is-invalid{% endif %}" value="{{ form.ciclo.value|default:'' }}" required>
+                    {% for error in form.ciclo.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label for="id_avatar" class="col-sm-4 col-form-label">Foto de Perfil</label>
+                <div class="col-sm-8">
+                    <input type="file" name="avatar" id="id_avatar" class="form-control {% if form.avatar.errors %}is-invalid{% endif %}" accept="image/*">
+                    {% for error in form.avatar.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">💾 Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
